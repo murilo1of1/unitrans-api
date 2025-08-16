@@ -22,13 +22,24 @@ const Aluno = sequelize.define(
         isEmail: true,
       },
     },
-    senha: {
+    passwordHash: {
+      field: "password_hash",
       type: DataTypes.STRING,
       allowNull: true,
     },
     token: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+    },
+    resetPasswordToken: {
+      field: "reset_password_token",
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    resetPasswordExpires: {
+      field: "reset_password_expires",
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {
