@@ -36,6 +36,20 @@ const Empresa = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    resetPasswordToken: {
+      field: "reset_password_token",
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    resetPasswordExpires: {
+      field: "reset_password_expires",
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    token: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,
