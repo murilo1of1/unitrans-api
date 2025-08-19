@@ -22,10 +22,15 @@ const Aluno = sequelize.define(
         isEmail: true,
       },
     },
+    cpf: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
     passwordHash: {
       field: "password_hash",
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     token: {
       type: DataTypes.STRING,

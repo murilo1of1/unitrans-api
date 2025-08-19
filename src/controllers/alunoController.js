@@ -10,7 +10,7 @@ const get = async (req, res) => {
     const id = req.params.id
       ? req.params.id.toString().replace(/\D/g, "")
       : null;
-
+ 
     if (!id) {
       const response = await Aluno.findAll({
         order: [["id", "desc"]],
@@ -26,7 +26,7 @@ const get = async (req, res) => {
     const response = await Aluno.findOne({
       where: {
         id: id,
-      },
+      }, 
       attributes: { exclude: ["passwordHash"] },
     });
 
@@ -47,7 +47,7 @@ const get = async (req, res) => {
 
 const create = async (corpo) => {
   try {
-    const { nome, email, senha, token, idEmpresa, idPlano } = corpo;
+    const { nome, email, senha, token, idEmpresa, idPlano, cpf } = corpo;
 
     let passwordHash = null;
     if (senha) {
@@ -59,6 +59,7 @@ const create = async (corpo) => {
       email,
       passwordHash,
       token,
+      cpf,
       idEmpresa,
       idPlano,
     });
