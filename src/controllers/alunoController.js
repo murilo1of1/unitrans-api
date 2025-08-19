@@ -44,7 +44,7 @@ const get = async (req, res) => {
     });
   }
 };
-
+ 
 const create = async (corpo) => {
   try {
     const { nome, email, senha, token, idEmpresa, idPlano, cpf } = corpo;
