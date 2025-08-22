@@ -11,6 +11,10 @@ const Veiculo = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
+    descricao: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     placa: {
       type: DataTypes.STRING,
       allowNull: false,
