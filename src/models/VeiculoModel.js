@@ -28,6 +28,10 @@ const Veiculo = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    imagem: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,

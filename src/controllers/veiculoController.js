@@ -1,4 +1,6 @@
 import Veiculo from "../models/VeiculoModel.js";
+import path from "path";
+import fs from "fs";
 
 const get = async (req, res) => {
   try {
@@ -80,7 +82,7 @@ const getByEmpresa = async (req, res) => {
 
 const create = async (corpo) => {
   try {
-    const { descricao, placa, modelo, capacidade, idEmpresa } = corpo;
+    const { descricao, placa, modelo, capacidade, idEmpresa, imagem } = corpo;
 
     const response = await Veiculo.create({
       descricao,
@@ -88,6 +90,7 @@ const create = async (corpo) => {
       modelo,
       capacidade,
       idEmpresa,
+      imagem,
     });
 
     return response;
@@ -105,7 +108,7 @@ const update = async (corpo, id) => {
     });
 
     if (!response) {
-      throw new Error("Veículo não encontrado");
+      throw new Error("Nao achou");
     }
 
     Object.keys(corpo).forEach((item) => (response[item] = corpo[item]));
@@ -122,16 +125,56 @@ const persist = async (req, res) => {
     const id = req.params.id
       ? req.params.id.toString().replace(/\D/g, "")
       : null;
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
 
     if (!id) {
-      const response = await create(req.body);
+      const processedData = {};
+      Object.keys(req.body).forEach((key) => {
+        const value = req.body[key];
+        processedData[key] = Array.isArray(value) ? value[0] : value;
+      });
+
+      const data = { ...processedData, imagem: null };
+      const response = await create(data);
+
+      if (req.files && req.files.imagem) {
+        const image = req.files.imagem;
+        const ext = path.extname(image.name);
+        const uploadDir = path.join(process.cwd(), "public");
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const fileName = `veiculo_${response.id}${ext}`;
+        await image.mv(path.join(uploadDir, fileName));
+
+        response.imagem = `${baseUrl}/${fileName}`;
+        await response.save();
+      }
+
       return res.status(201).send({
         message: "Veículo criado com sucesso!",
         data: response,
       });
     }
 
-    const response = await update(req.body, id);
+    let imagePath = null;
+    if (req.files && req.files.imagem) {
+      const image = req.files.imagem;
+      const ext = path.extname(image.name);
+      const uploadDir = path.join(process.cwd(), "public");
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      const fileName = `veiculo_${id}${ext}`;
+      await image.mv(path.join(uploadDir, fileName));
+      imagePath = `${baseUrl}/${fileName}`;
+    }
+
+    const data = {
+      ...req.body,
+      ...(imagePath && { imagem: imagePath }),
+    };
+    const response = await update(data, id);
     return res.status(200).send({
       message: "Veículo atualizado com sucesso!",
       data: response,

@@ -14,6 +14,18 @@ const Rota = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    inicio: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    destino: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    data: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,
