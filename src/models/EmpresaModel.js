@@ -50,6 +50,12 @@ const Empresa = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    tipoVinculo: {
+      field: "tipo_vinculo",
+      type: DataTypes.ENUM('ambos', 'token', 'pesquisa'),
+      defaultValue: 'ambos',
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,

@@ -56,17 +56,6 @@ const Aluno = sequelize.define(
   }
 );
 
-Aluno.belongsTo(Empresa, {
-  as: "empresa",
-  onUpdate: "NO ACTION",
-  onDelete: "NO ACTION",
-  foreignKey: {
-    name: "idEmpresa",
-    allowNull: true,
-    field: "id_empresa",
-  },
-});
-
 Aluno.belongsTo(Plano, {
   as: "plano",
   onUpdate: "NO ACTION",
