@@ -13,6 +13,11 @@ const get = async (req, res) => {
 
     if (!id) {
       const response = await Empresa.findAll({
+        where: {
+          tipoVinculo: {
+            [Op.in]: ['ambos', 'pesquisa']
+          }
+        },
         order: [["id", "desc"]],
         attributes: { exclude: ["passwordHash"] },
       });
