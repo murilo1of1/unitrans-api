@@ -57,7 +57,7 @@
 Crie um arquivo `.env` na raiz do projeto:
 
 ```env
-API_PORT=3333
+API_PORT=3000
 POSTGRES_DB=unitrans_db
 POSTGRES_USERNAME=postgres
 POSTGRES_PASSWORD=sua_senha
@@ -224,5 +224,5 @@ Este projeto está sob licença MIT. Veja o arquivo `LICENSE` para mais detalhes
 ---
 
 <div align="center">
-  <p>Desenvolvido com ❤️ para facilitar o transporte universitário</p>
+  <p>Desenvolvido para facilitar o transporte universitário</p>
 </div>
