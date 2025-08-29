@@ -42,7 +42,7 @@
 - [ ] Implementação de pagamentos
 - [ ] Sistema de avaliações
 - [ ] Relatórios e analytics
-- [ ] App mobile
+- [ ] Portabilidade
 
 ---
 
