@@ -197,7 +197,6 @@ const gerarToken = async (req, res) => {
   try {
     const { empresaId } = req.body;
 
-    // Verificar se empresa existe
     const empresa = await Empresa.findByPk(empresaId);
     if (!empresa) {
       return res.status(404).send({
@@ -205,11 +204,9 @@ const gerarToken = async (req, res) => {
       });
     }
 
-    // Gerar token único de 8 caracteres
     const tokenPlain = crypto.randomBytes(4).toString('hex').toUpperCase();
     const tokenHash = await bcrypt.hash(tokenPlain, 10);
     
-    // Data de expiração: 30 minutos
     const dataExpiracao = new Date();
     dataExpiracao.setMinutes(dataExpiracao.getMinutes() + 30);
 
@@ -222,7 +219,7 @@ const gerarToken = async (req, res) => {
     return res.status(201).send({
       message: "Token de acesso gerado com sucesso!",
       data: {
-        token: tokenPlain, // Retorna o token plain para o usuário
+        token: tokenPlain, 
         expiraEm: tokenAcesso.dataExpiracao,
         empresa: empresa.nome,
       },
@@ -314,13 +311,11 @@ const vincularPorToken = async (req, res) => {
   try {
     const { token, alunoId } = req.body;
 
-    // Buscar todos os tokens ativos da empresa
     const tokensAtivos = await TokenAcesso.findAll({
       where: { ativo: true },
       include: [{ model: Empresa, as: "empresa" }],
     });
 
-    // Verificar qual token corresponde ao hash
     let tokenAcesso = null;
     for (const t of tokensAtivos) {
       const isValid = await bcrypt.compare(token, t.token);
@@ -336,21 +331,18 @@ const vincularPorToken = async (req, res) => {
       });
     }
 
-    // Verificar se token expirou
     if (new Date() > tokenAcesso.dataExpiracao) {
       return res.status(400).send({
         message: "Token expirado",
       });
     }
 
-    // Verificar se token já foi usado (se for uso único)
     if (tokenAcesso.usoUnico && tokenAcesso.usado) {
       return res.status(400).send({
         message: "Token já foi utilizado",
       });
     }
 
-    // Verificar se já existe vínculo ativo entre MESMO aluno e MESMA empresa
     const vinculoExistente = await EmpresaAluno.findOne({
       where: {
         empresaId: tokenAcesso.empresaId,
@@ -365,7 +357,6 @@ const vincularPorToken = async (req, res) => {
       });
     }
 
-    // Criar vínculo
     const vinculo = await EmpresaAluno.create({
       empresaId: tokenAcesso.empresaId,
       alunoId,
@@ -373,7 +364,6 @@ const vincularPorToken = async (req, res) => {
       vinculadoPor: tokenAcesso.id.toString(),
     });
 
-    // Marcar token como usado
     await tokenAcesso.update({
       usado: true,
       usadoEm: new Date(),
@@ -410,7 +400,6 @@ const solicitarVinculo = async (req, res) => {
       });
     }
 
-    // Verificar se já existe vínculo ativo entre MESMO aluno e MESMA empresa
     const vinculoExistente = await EmpresaAluno.findOne({
       where: {
         empresaId,
@@ -649,22 +638,17 @@ const rejeitarSolicitacao = async (req, res) => {
 };
 
 export default {
-  // Gestão de vínculos
   criarVinculo,
   listarVinculos,
   listarVinculosAluno,
   listarVinculosEmpresa,
   desativarVinculo,
   reativarVinculo,
-  
-  // Gestão de tokens
   gerarToken,
   listarTokens,
   listarTokensEmpresa,
   revogarToken,
   vincularPorToken,
-  
-  // Gestão de solicitações
   solicitarVinculo,
   listarSolicitacoes,
   listarSolicitacoesEmpresa,
