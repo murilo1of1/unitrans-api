@@ -14,7 +14,7 @@ const Rota = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    inicio: {
+    origem: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -22,8 +22,8 @@ const Rota = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    data: {
-      type: DataTypes.DATE,
+    tipo: {
+      type: DataTypes.ENUM("ida", "volta"),
       allowNull: false,
     },
   },

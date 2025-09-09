@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/postgres.js";
-import Rota from "./RotaModel.js";
+import Empresa from "./EmpresaModel.js";
 
 const Ponto = sequelize.define(
   "pontos",
@@ -14,9 +14,9 @@ const Ponto = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    ordem: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    endereco: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     latitude: {
       type: DataTypes.DOUBLE,
@@ -35,14 +35,14 @@ const Ponto = sequelize.define(
   }
 );
 
-Ponto.belongsTo(Rota, {
-  as: "rota",
+Ponto.belongsTo(Empresa, {
+  as: "empresa",
   onUpdate: "NO ACTION",
   onDelete: "NO ACTION",
   foreignKey: {
-    name: "idRota",
+    name: "idEmpresa",
     allowNull: false,
-    field: "id_rota",
+    field: "id_empresa",
   },
 });
 
