@@ -8,6 +8,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import "./models/index.js";
 import fileupload from "express-fileupload";
+import swaggerSetup from "./swagger.js";
 
 import Routes from "./routes/index.js";
 import { sequelize } from "./config/postgres.js";
@@ -32,12 +33,12 @@ app.use(cors(corsOptions));
 app.use(morgan("combined", { stream: logStream }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-
 app.use(
   fileupload({
     createParentPath: true,
   })
 );
+swaggerSetup(app);
 
 app.use(express.static(path.join(__dirname, "../public")));
 

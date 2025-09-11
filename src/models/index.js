@@ -12,6 +12,21 @@ import EmpresaAluno from "./EmpresaAlunoModel.js";
 import TokenAcesso from "./TokenAcessoModel.js";
 import SolicitacaoVinculo from "./SolicitacaoVinculoModel.js";
 
+Rota.hasMany(RotaPonto, {
+  as: "pontos",
+  foreignKey: "idRota",
+});
+
+RotaPonto.belongsTo(Rota, {
+  as: "rota",
+  foreignKey: "idRota",
+});
+
+RotaPonto.belongsTo(Ponto, {
+  as: "ponto",
+  foreignKey: "idPonto",
+});
+
 (async () => {
   await Empresa.sync({ force: true });
   await Plano.sync({ force: true });

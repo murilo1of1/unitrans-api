@@ -7,5 +7,4 @@ export default (app) => {
   app.patch("/rota/:id", rotaController.persist);
   app.delete("/rota/:id", rotaController.destroy);
   app.get("/empresa/:idEmpresa/rotas", rotaController.getByEmpresa);
-  app.get("/veiculo/:idVeiculo/rotas", rotaController.getByVeiculo);
 };
