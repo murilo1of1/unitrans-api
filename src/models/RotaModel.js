@@ -22,10 +22,6 @@ const Rota = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    tipo: {
-      type: DataTypes.ENUM("ida", "volta"),
-      allowNull: false,
-    },
   },
   {
     freezeTableName: true,

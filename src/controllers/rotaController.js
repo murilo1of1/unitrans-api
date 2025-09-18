@@ -145,12 +145,8 @@ const persist = async (req, res) => {
 
     const { nome, origem, destino, tipo, idEmpresa } = req.body;
 
-    if (!nome || !origem || !destino || !tipo || !idEmpresa) {
+    if (!nome || !origem || !destino || !idEmpresa) {
       return res.status(400).send("Dados obrigatórios não informados");
-    }
-
-    if (!["ida", "volta"].includes(tipo)) {
-      return res.status(400).send("Tipo deve ser 'ida' ou 'volta'");
     }
 
     const empresa = await Empresa.findByPk(idEmpresa);
@@ -158,7 +154,7 @@ const persist = async (req, res) => {
       return res.status(404).send("Empresa não encontrada");
     }
 
-    const data = { nome, origem, destino, tipo, idEmpresa };
+    const data = { nome, origem, destino, idEmpresa };
 
     if (id) {
       await Rota.update(data, { where: { id } });
