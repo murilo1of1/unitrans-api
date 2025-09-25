@@ -4,7 +4,7 @@ import sendMail from "../utils/email.js";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-    
+      
 const get = async (req, res) => {
   try {
     const id = req.params.id
