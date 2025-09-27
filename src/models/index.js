@@ -1,6 +1,5 @@
 import Empresa from "./EmpresaModel.js";
 import Rota from "./RotaModel.js";
-import Veiculo from "./VeiculoModel.js";
 import Ponto from "./PontoModel.js";
 import RotaPonto from "./RotaPontoModel.js";
 import Plano from "./PlanoModel.js";
@@ -27,11 +26,15 @@ RotaPonto.belongsTo(Ponto, {
   foreignKey: "idPonto",
 });
 
+Ponto.hasMany(RotaPonto, {
+  as: "rotaPontos",
+  foreignKey: "idPonto",
+});
+
 (async () => {
   await Empresa.sync({ force: true });
   await Plano.sync({ force: true });
   await Rota.sync({ force: true });
-  await Veiculo.sync({ force: true });
   await Ponto.sync({ force: true });
   await RotaPonto.sync({ force: true });
   await Aluno.sync({ force: true });

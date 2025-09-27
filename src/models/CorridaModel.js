@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/postgres.js";
-import Veiculo from "./VeiculoModel.js";
 
 const Corrida = sequelize.define(
   "corridas",
@@ -31,16 +30,5 @@ const Corrida = sequelize.define(
     updatedAt: "updated_at",
   }
 );
-
-Corrida.belongsTo(Veiculo, {
-  as: "veiculo",
-  onUpdate: "NO ACTION",
-  onDelete: "NO ACTION",
-  foreignKey: {
-    name: "idVeiculo",
-    allowNull: false,
-    field: "id_veiculo",
-  },
-});
 
 export default Corrida;

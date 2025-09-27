@@ -1,5 +1,4 @@
 import Rota from "../models/RotaModel.js";
-import Veiculo from "../models/VeiculoModel.js";
 import Empresa from "../models/EmpresaModel.js";
 import RotaPonto from "../models/RotaPontoModel.js";
 import Ponto from "../models/PontoModel.js";
@@ -92,51 +91,6 @@ const getByEmpresa = async (req, res) => {
   }
 };
 
-const getByVeiculo = async (req, res) => {
-  try {
-    const idVeiculo = req.params.idVeiculo
-      ? req.params.idVeiculo.toString().replace(/\D/g, "")
-      : null;
-
-    if (!idVeiculo) {
-      return res.status(400).send("ID do veículo é obrigatório");
-    }
-
-    const response = await Rota.findAll({
-      include: [
-        {
-          model: Veiculo,
-          as: "veiculo",
-          where: { id: idVeiculo },
-          attributes: ["id", "descricao", "placa"],
-        },
-        {
-          model: RotaPonto,
-          as: "pontos",
-          include: [
-            {
-              model: Ponto,
-              as: "ponto",
-              attributes: ["id", "nome", "endereco", "latitude", "longitude"],
-            },
-          ],
-          order: [["ordem", "asc"]],
-        },
-      ],
-      order: [["tipo", "asc"]],
-    });
-
-    return res.status(200).send({
-      message: "Rotas do veículo encontradas",
-      data: response,
-    });
-  } catch (error) {
-    return res.status(500).send({
-      message: error.message,
-    });
-  }
-};
-
 const persist = async (req, res) => {
   try {
     const id = req.params.id
@@ -206,10 +160,164 @@ const destroy = async (req, res) => {
   }
 };
 
+// Listar pontos de uma rota específica
+const getPontosRota = async (req, res) => {
+  try {
+    const { idRota } = req.params;
+
+    const rota = await Rota.findByPk(idRota, {
+      include: [
+        {
+          model: RotaPonto,
+          as: "pontos",
+          include: [
+            {
+              model: Ponto,
+              as: "ponto",
+              attributes: ["id", "nome", "endereco", "latitude", "longitude"],
+            },
+          ],
+          order: [["ordem", "ASC"]],
+        },
+      ],
+    });
+
+    if (!rota) {
+      return res.status(404).send({
+        message: "Rota não encontrada",
+      });
+    }
+
+    return res.status(200).send({
+      message: "Pontos da rota encontrados",
+      data: rota.pontos || [],
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
+// Adicionar ponto à rota
+const addPontoToRota = async (req, res) => {
+  try {
+    const { idRota } = req.params;
+    const { idPonto, tipo, ordem } = req.body;
+
+    // Verificar se a rota existe
+    const rota = await Rota.findByPk(idRota);
+    if (!rota) {
+      return res.status(404).send({
+        message: "Rota não encontrada",
+      });
+    }
+
+    // Verificar se o ponto existe
+    const ponto = await Ponto.findByPk(idPonto);
+    if (!ponto) {
+      return res.status(404).send({
+        message: "Ponto não encontrado",
+      });
+    }
+
+    // Verificar se já existe este ponto na rota com mesmo tipo
+    const existingRotaPonto = await RotaPonto.findOne({
+      where: {
+        idRota,
+        idPonto,
+        tipo,
+      },
+    });
+
+    if (existingRotaPonto) {
+      return res.status(400).send({
+        message: `Este ponto já está cadastrado como ${tipo} nesta rota`,
+      });
+    }
+
+    // Criar nova associação
+    const rotaPonto = await RotaPonto.create({
+      idRota,
+      idPonto,
+      tipo,
+      ordem: ordem || 1,
+      ativo: true,
+    });
+
+    return res.status(201).send({
+      message: "Ponto adicionado à rota com sucesso",
+      data: rotaPonto,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
+// Remover ponto da rota
+const removePontoFromRota = async (req, res) => {
+  try {
+    const { idRotaPonto } = req.params;
+
+    const rotaPonto = await RotaPonto.findByPk(idRotaPonto);
+    if (!rotaPonto) {
+      return res.status(404).send({
+        message: "Associação não encontrada",
+      });
+    }
+
+    await rotaPonto.destroy();
+
+    return res.status(200).send({
+      message: "Ponto removido da rota com sucesso",
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
+// Atualizar ponto da rota (ordem, tipo, ativo)
+const updatePontoRota = async (req, res) => {
+  try {
+    const { idRotaPonto } = req.params;
+    const { ordem, tipo, ativo } = req.body;
+
+    const rotaPonto = await RotaPonto.findByPk(idRotaPonto);
+    if (!rotaPonto) {
+      return res.status(404).send({
+        message: "Associação não encontrada",
+      });
+    }
+
+    // Atualizar campos se fornecidos
+    if (ordem !== undefined) rotaPonto.ordem = ordem;
+    if (tipo !== undefined) rotaPonto.tipo = tipo;
+    if (ativo !== undefined) rotaPonto.ativo = ativo;
+
+    await rotaPonto.save();
+
+    return res.status(200).send({
+      message: "Ponto da rota atualizado com sucesso",
+      data: rotaPonto,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
 export default {
   get,
   getByEmpresa,
-  getByVeiculo,
   persist,
   destroy,
+  getPontosRota,
+  addPontoToRota,
+  removePontoFromRota,
+  updatePontoRota,
 };
