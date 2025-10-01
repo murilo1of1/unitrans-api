@@ -325,13 +325,6 @@ const getPassageirosRota = async (req, res) => {
       });
     }
 
-    const sessaoAtiva = await RotaSessao.findOne({
-      where: {
-        idRota,
-        dataSessao: hoje,
-      },
-    });
-
     const whereClausePontos = { idRota };
     if (tipo) {
       whereClausePontos.tipo = tipo;
@@ -449,14 +442,6 @@ const getPassageirosRota = async (req, res) => {
           id: rota.id,
           nome: rota.nome,
         },
-        sessao: sessaoAtiva
-          ? {
-              id: sessaoAtiva.id,
-              status: sessaoAtiva.status,
-              horarioLimite: sessaoAtiva.horarioLimiteEscolha,
-              data: sessaoAtiva.dataSessao,
-            }
-          : null,
         tipo: tipo || "todos",
         data: hoje,
         pontosComPassageiros: passageirosPorPonto,
