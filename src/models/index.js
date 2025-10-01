@@ -10,6 +10,7 @@ import Pagamento from "./PagamentoModel.js";
 import EmpresaAluno from "./EmpresaAlunoModel.js";
 import TokenAcesso from "./TokenAcessoModel.js";
 import SolicitacaoVinculo from "./SolicitacaoVinculoModel.js";
+import RotaPassageiro from "./RotaPassageiroModel.js";
 
 Rota.hasMany(RotaPonto, {
   as: "pontos",
@@ -44,4 +45,5 @@ Ponto.hasMany(RotaPonto, {
   await Corrida.sync({ force: true });
   await PassageiroLog.sync({ force: true });
   await Pagamento.sync({ force: true });
+  await RotaPassageiro.sync({ force: true });
 })();

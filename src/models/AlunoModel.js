@@ -18,7 +18,7 @@ const Aluno = sequelize.define(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,   
+      unique: true,
       validate: {
         isEmail: true,
       },
@@ -26,7 +26,7 @@ const Aluno = sequelize.define(
     cpf: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
     },
     passwordHash: {
       field: "password_hash",
@@ -47,6 +47,24 @@ const Aluno = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    pontoEmbarque: {
+      field: "ponto_embarque",
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "pontos",
+        key: "id",
+      },
+    },
+    pontoDesembarque: {
+      field: "ponto_desembarque",
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "pontos",
+        key: "id",
+      },
+    },
   },
   {
     freezeTableName: true,
@@ -64,6 +82,31 @@ Aluno.belongsTo(Plano, {
     name: "idPlano",
     allowNull: true,
     field: "id_plano",
+  },
+});
+
+// Associações com pontos de embarque e desembarque
+import Ponto from "./PontoModel.js";
+
+Aluno.belongsTo(Ponto, {
+  as: "pontoEmbarqueObj",
+  onUpdate: "NO ACTION",
+  onDelete: "SET NULL",
+  foreignKey: {
+    name: "pontoEmbarque",
+    allowNull: true,
+    field: "ponto_embarque",
+  },
+});
+
+Aluno.belongsTo(Ponto, {
+  as: "pontoDesembarqueObj",
+  onUpdate: "NO ACTION",
+  onDelete: "SET NULL",
+  foreignKey: {
+    name: "pontoDesembarque",
+    allowNull: true,
+    field: "ponto_desembarque",
   },
 });
 

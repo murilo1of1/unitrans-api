@@ -19,4 +19,7 @@ export default (app) => {
     "/rota/:idRota/pontos/:idRotaPonto",
     rotaController.updatePontoRota
   );
+
+  // Buscar passageiros da rota
+  app.post("/rota/passageiros", rotaController.getPassageirosRota);
 };

@@ -9,4 +9,5 @@ export default (app) => {
   app.post("/aluno/login", alunoController.login);
   app.post("/aluno/forgot-password", alunoController.forgotPassword);
   app.post("/aluno/reset-password", alunoController.resetPassword);
+  app.post("/aluno/escolher-pontos", alunoController.salvarEscolhasPontos);
 };

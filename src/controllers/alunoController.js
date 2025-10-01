@@ -1,16 +1,20 @@
 import Aluno from "../models/AlunoModel.js";
+import RotaPassageiro from "../models/RotaPassageiroModel.js";
+import Ponto from "../models/PontoModel.js";
+import Rota from "../models/RotaModel.js";
+import EmpresaAluno from "../models/EmpresaAlunoModel.js";
 import bcrypt from "bcrypt";
 import sendMail from "../utils/email.js";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-      
+
 const get = async (req, res) => {
   try {
     const id = req.params.id
       ? req.params.id.toString().replace(/\D/g, "")
       : null;
- 
+
     if (!id) {
       const response = await Aluno.findAll({
         order: [["id", "desc"]],
@@ -26,7 +30,7 @@ const get = async (req, res) => {
     const response = await Aluno.findOne({
       where: {
         id: id,
-      }, 
+      },
       attributes: { exclude: ["passwordHash"] },
     });
 
@@ -44,7 +48,7 @@ const get = async (req, res) => {
     });
   }
 };
- 
+
 const create = async (corpo) => {
   try {
     const { nome, email, senha, token, idEmpresa, idPlano, cpf } = corpo;
@@ -284,6 +288,121 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// Salvar escolhas de embarque e desembarque do aluno
+const salvarEscolhasPontos = async (req, res) => {
+  try {
+    console.log("Dados recebidos no backend:", req.body);
+    const { idAluno, idRota, pontoEmbarque, pontoDesembarque } = req.body;
+    console.log("Campos extraídos:", {
+      idAluno,
+      idRota,
+      pontoEmbarque,
+      pontoDesembarque,
+    });
+
+    if (!idAluno || !idRota || !pontoEmbarque || !pontoDesembarque) {
+      return res.status(400).send({
+        message:
+          "Todos os campos são obrigatórios: idAluno, idRota, pontoEmbarque, pontoDesembarque",
+      });
+    }
+
+    // Verificar se o aluno existe
+    const aluno = await Aluno.findByPk(idAluno);
+    if (!aluno) {
+      return res.status(404).send({
+        message: "Aluno não encontrado",
+      });
+    }
+
+    // Verificar se a rota existe
+    const rota = await Rota.findByPk(idRota);
+    if (!rota) {
+      return res.status(404).send({
+        message: "Rota não encontrada",
+      });
+    }
+
+    // Verificar se o aluno está vinculado à empresa da rota
+    const vinculo = await EmpresaAluno.findOne({
+      where: {
+        alunoId: idAluno,
+        empresaId: rota.idEmpresa,
+        ativo: true,
+      },
+    });
+
+    if (!vinculo) {
+      return res.status(403).send({
+        message: "Aluno não está vinculado à empresa desta rota",
+      });
+    }
+
+    // Verificar se os pontos existem
+    const pontoEmb = await Ponto.findByPk(pontoEmbarque);
+    const pontoDes = await Ponto.findByPk(pontoDesembarque);
+
+    if (!pontoEmb || !pontoDes) {
+      return res.status(404).send({
+        message: "Um ou ambos os pontos não foram encontrados",
+      });
+    }
+
+    // Atualizar escolhas atuais do aluno
+    await aluno.update({
+      pontoEmbarque: pontoEmbarque,
+      pontoDesembarque: pontoDesembarque,
+    });
+
+    // Data atual para criar registro histórico
+    const hoje = new Date().toISOString().split("T")[0];
+
+    // Verificar se já existe um registro para hoje
+    const registroExistente = await RotaPassageiro.findOne({
+      where: {
+        idRota,
+        idAluno,
+        dataEscolha: hoje,
+      },
+    });
+
+    if (registroExistente) {
+      // Atualizar registro existente
+      await registroExistente.update({
+        pontoEmbarque,
+        pontoDesembarque,
+        ativo: true,
+      });
+    } else {
+      // Criar novo registro histórico
+      await RotaPassageiro.create({
+        idRota,
+        idAluno,
+        pontoEmbarque,
+        pontoDesembarque,
+        dataEscolha: hoje,
+        ativo: true,
+      });
+    }
+
+    return res.status(200).send({
+      message: "Escolhas salvas com sucesso",
+      data: {
+        aluno: {
+          id: aluno.id,
+          nome: aluno.nome,
+          pontoEmbarque: pontoEmb.nome,
+          pontoDesembarque: pontoDes.nome,
+        },
+      },
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
 export default {
   get,
   persist,
@@ -291,4 +410,5 @@ export default {
   login,
   resetPassword,
   forgotPassword,
+  salvarEscolhasPontos,
 };
